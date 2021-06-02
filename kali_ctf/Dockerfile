@@ -14,13 +14,21 @@ RUN rm -fR /var/lib/apt/ && \
 # RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 
 # Some system tools
-RUN apt-get install -y git colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd nodejs npm yarnpkg net-tools iputils-ping ncat john hashcat
+RUN apt-get install -y git colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd nodejs npm yarnpkg net-tools iputils-ping ncat john hashcat nano metasploit-framework
 
 # secLists
 # RUN git clone https://github.com/danielmiessler/SecLists /usr/share/seclists
 
 # radare2
 RUN git clone https://github.com/radare/radare2 && cd radare2 && sys/install.sh
+
+RUN git clone https://github.com/the-c0d3r/buffer-overflow.git /home
+
+# ynetd
+RUN YNETD_VERSION=v0.14 && \
+    wget -qO /tmp/ynetd.zip https://github.com/rwstauner/ynetd/releases/download/$YNETD_VERSION/ynetd-linux-amd64.zip \
+    && unzip -d /usr/local/bin/ /tmp/ynetd.zip \
+    && rm -f /tmp/ynetd.zip
 
 # w3af - web app auditing
 # RUN git clone https://github.com/andresriancho/w3af.git /opt/w3af && \
@@ -44,6 +52,9 @@ RUN git clone https://github.com/radare/radare2 && cd radare2 && sys/install.sh
 # Clean up
 RUN apt-get autoremove -y && \
     apt-get clean 
+
+COPY hackme3 /home
+COPY ynetd /home
 
 # Expose a port for shinanegans
 EXPOSE 8080
