@@ -1,62 +1,69 @@
-FROM kalilinux/kali-rolling:latest
+FROM ubuntu:latest
 
-ENV DEBIAN_FRONTEND noninteractive
+# Configure debian
+ARG DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
 ENV TERM xterm-256color
 
-# Install Kali Full
+# Get package cache and upgrade packages
 RUN rm -fR /var/lib/apt/ && \
     apt-get clean && \
-    apt-get update -y #&& \
-    apt-get install -y software-properties-common kali-linux-full --fix-missing && \
-    echo 'VERSION_CODENAME=kali-rolling' >> /etc/os-release
+    apt-get update -y && \
+    apt-get upgrade -y
 
 # Add NodeJS repo
-# RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 
-# Some system tools
-RUN apt-get install -y git colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd nodejs npm yarnpkg net-tools iputils-ping ncat john hashcat nano metasploit-framework
+# Some tools
+RUN apt-get install -y git cmake qtchooser wget gnupg colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd  yarnpkg net-tools iputils-ping ncat john hashcat nano openvpn xterm pkg-config 
 
-# secLists
-# RUN git clone https://github.com/danielmiessler/SecLists /usr/share/seclists
+# More tools
+RUN apt-get install -y nmap
 
-# radare2
-RUN git clone https://github.com/radare/radare2 && cd radare2 && sys/install.sh
+# Clone some tools fron github to our home dir
+WORKDIR /home
 
-RUN git clone https://github.com/the-c0d3r/buffer-overflow.git /home
+# seclists wordlist collection
+RUN git clone https://github.com/danielmiessler/SecLists.git
 
-# ynetd
-RUN YNETD_VERSION=v0.14 && \
-    wget -qO /tmp/ynetd.zip https://github.com/rwstauner/ynetd/releases/download/$YNETD_VERSION/ynetd-linux-amd64.zip \
-    && unzip -d /usr/local/bin/ /tmp/ynetd.zip \
-    && rm -f /tmp/ynetd.zip
+# radare2 for binary reverse engineering
+RUN git clone https://github.com/radareorg/radare2.git && cd radare2 && sys/install.sh && cd /home
 
-# w3af - web app auditing
-# RUN git clone https://github.com/andresriancho/w3af.git /opt/w3af && \
-#    apt-get install -y libssl-dev libxml2-dev libxslt1-dev zlib1g-dev python-dev python-pybloomfiltermmap ; \
-#    /opt/w3af/w3af_console ; \
-#    bash /tmp/w3af_dependency_install.sh ; \
-#    echo 'export PATH=/opt/w3af:$PATH' >> /etc/profile
+# ghidra binary decompile plugin for radare2
+RUN /home/radare2/binr/r2pm/r2pm init
+RUN /home/radare2/binr/r2pm/r2pm -ci r2ghidra
+# RUN pip install r2env && \
+#    r2env init && \
+#    r2env add radare2 && \
+#    r2env use radare2@git && \
+#    r2env shell r2 -v
 
-# ngrok - secure introspectable tunnels to localhost
-# RUN curl https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip | gunzip - > /usr/bin/ngrok && \
-#    chmod +x /usr/bin/ngrok
+# pwncat post-exploitation framework by calebstewart (there is more than one major project called pwncat)
+RUN pip install git+https://github.com/calebstewart/pwncat.git
 
-# Tor refresh every 5 requests
-# RUN echo MaxCircuitDirtiness 10 >> /etc/tor/torrc && \
-#    update-rc.d tor enable
+# AutoRecon enumeration toolkit
+RUN pip install toml && \
+    pip install appdirs
+RUN git clone https://github.com/Tib3rius/AutoRecon.git
 
-# Use random proxy chains / round_robin_chain for pc4
-#RUN sed -i 's/^strict_chain/#strict_chain/g;s/^#random_chain/random_chain/g' /etc/proxychains.conf && \
-#    sed -i 's/^strict_chain/#strict_chain/g;s/^round_robin_chain/round_robin_chain/g' /etc/proxychains4.conf
+# feroxbuster
+RUN git clone https://github.com/epi052/feroxbuster.git
+RUN /home/feroxbuster/install-nix.sh
+
+# Privilege Escalation Awesome Scripts Suite
+RUN git clone https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite.git
 
 # Clean up
 RUN apt-get autoremove -y && \
     apt-get clean 
 
-COPY hackme3 /home
-COPY ynetd /home
+# Expose ports for shinanegans
+EXPOSE 22 80 8080
 
-# Expose a port for shinanegans
-EXPOSE 8080
+# Copy the ovpn file for HTB
+COPY lab_leadOctopus.ovpn /home
 
-# CMD "/bin/zsh"
+# Reconfigure the shell prompt to have useful info and fancy colors
+RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
+
+
+
