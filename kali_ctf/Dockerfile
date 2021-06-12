@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 # Configure debian
-ARG DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
+ENV DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
 ENV TERM xterm-256color
 
 # Get package cache and upgrade packages
@@ -17,7 +17,7 @@ RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 RUN apt-get install -y git cmake qtchooser wget gnupg colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd  yarnpkg net-tools iputils-ping ncat john hashcat nano openvpn xterm pkg-config 
 
 # More tools
-RUN apt-get install -y nmap hydra
+RUN apt-get install -y nmap hydra ftp
 
 # Clone some tools fron github to our home dir
 WORKDIR /home
@@ -37,6 +37,10 @@ RUN /home/radare2/binr/r2pm/r2pm -ci r2ghidra
 # Stabilizes unstable reverse shells, establishes real tty, facilitates file transfers between exploited hosts
 RUN pip install git+https://github.com/calebstewart/pwncat.git
 
+# Searchsploit exploit search tool
+RUN git clone git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
+RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
+
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
 RUN pip install toml && \
@@ -52,6 +56,10 @@ RUN /home/feroxbuster/install-nix.sh
 # Upload these scripts to exploited hosts and run to discover potential vectors of privesc
 RUN git clone https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite.git
 
+# Linux Smart Enumeration
+# Automated scan for potential privesc
+RUN https://github.com/diego-treitos/linux-smart-enumeration.git
+
 # overflow_with_joy
 # Linux stack-based buffer overflow practice repo
 RUN git clone https://github.com/LauraWartschinski/overflow_with_joy.git
@@ -63,11 +71,8 @@ RUN apt-get autoremove -y && \
 # Expose ports for shinanegans
 EXPOSE 22 80 8080
 
-# Copy the ovpn file for HTB
-# COPY lab_leadOctopus.ovpn /home
-
 # Reconfigure the shell prompt to have useful info and fancy colors
-RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
+RUN echo "PS1='🏴‍☠️ \[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
 
 
 
