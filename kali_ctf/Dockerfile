@@ -17,7 +17,10 @@ RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 RUN apt-get install -y git cmake qtchooser wget gnupg colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd  yarnpkg net-tools iputils-ping ncat john hashcat nano openvpn xterm pkg-config 
 
 # More tools
-RUN apt-get install -y nmap hydra ftp
+RUN apt-get install -y nmap hydra ftp rubygems build-essential
+
+# WordPress scanner
+RUN gem install wpscan
 
 # Clone some tools fron github to our home dir
 WORKDIR /home
@@ -38,7 +41,7 @@ RUN /home/radare2/binr/r2pm/r2pm -ci r2ghidra
 RUN pip install git+https://github.com/calebstewart/pwncat.git
 
 # Searchsploit exploit search tool
-RUN git clone git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
+RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
 
 # AutoRecon enumeration toolkit
@@ -58,7 +61,7 @@ RUN git clone https://github.com/carlospolop/privilege-escalation-awesome-script
 
 # Linux Smart Enumeration
 # Automated scan for potential privesc
-RUN https://github.com/diego-treitos/linux-smart-enumeration.git
+RUN git clone https://github.com/diego-treitos/linux-smart-enumeration.git
 
 # overflow_with_joy
 # Linux stack-based buffer overflow practice repo
