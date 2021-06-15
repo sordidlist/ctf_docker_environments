@@ -17,10 +17,17 @@ RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 RUN apt-get install -y git cmake qtchooser wget gnupg colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd  yarnpkg net-tools iputils-ping ncat john hashcat nano openvpn xterm pkg-config 
 
 # More tools
-RUN apt-get install -y nmap hydra ftp rubygems build-essential
+RUN apt-get install -y nmap hydra ftp rubygems build-essential software-properties-common smbclient smbmap 
 
 # WordPress scanner
-RUN gem install wpscan
+#RUN apt-add-repository -y ppa:rael-gc/rvm && \
+#    apt-get update && \
+#    apt-get install rvm && \
+#    usermod -a -G rvm $USER && \
+#    rvm user gemsets && \
+#    rvm install ruby && \
+#    gem install wpscan
+
 
 # Clone some tools fron github to our home dir
 WORKDIR /home
