@@ -10,14 +10,39 @@ RUN rm -fR /var/lib/apt/ && \
     apt-get update -y && \
     apt-get upgrade -y
 
+
+## TODO
+## Should maybe not necessarily run all of the following as root even in a Docker container (r2 complains about this for instance)
+
+
 # Add NodeJS repo and install
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 
-# First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
-RUN apt-get install -y git cmake qtchooser wget gnupg colordiff colortail unzip vim tmux xterm zsh curl telnet strace ltrace tmate build-essential wget python3-setuptools python3-pip tor proxychains proxychains4 zstd  yarnpkg net-tools iputils-ping ncat john hashcat nano openvpn xterm pkg-config 
+# Add Kali package sources to /etc/apt/sources and import the public key
+RUN apt-get install -y gnupg && \
+    apt-key adv --recv-keys --keyserver keyserver.ubuntu.com ED444FF07D8D0BF6 && \
+    echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list && \
+    echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
+    echo "# deb-src http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list && \
+    # echo "deb http://http.kali.org/kali sana main non-free contrib" >> /etc/apt/sources.list && \
+    # echo "deb http://security.kali.org/kali-security sana/updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
+    # echo "# deb-src http://http.kali.org/kali sana main non-free contrib" >> /etc/apt/sources.list && \
+    # echo "# deb-src http://security.kali.org/kali-security sana/updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list && \
+    echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
+    echo "# deb-src http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list && \
+    apt-get update -y
 
-# More tools
-RUN apt-get install -y nmap hydra ftp rubygems build-essential software-properties-common smbclient smbmap sqlmap
+
+# First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
+RUN apt-get install apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra iputils-ping john ltrace nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 python3-pip python3-setuptools qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
+
+RUN pip3 install jwt
+
+RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && \
+    chmod 755 msfinstall && \
+    ./msfinstall
 
 # WordPress scanner
 #RUN apt-add-repository -y ppa:rael-gc/rvm && \
@@ -29,12 +54,9 @@ RUN apt-get install -y nmap hydra ftp rubygems build-essential software-properti
 #    gem install wpscan
 
 
+
 # Clone some tools fron github to our home dir
 WORKDIR /home
-
-# seclists wordlist collection
-# Frequently used as a wordlist source for bruteforcing
-RUN git clone https://github.com/danielmiessler/SecLists.git
 
 # radare2 for binary reverse engineering and disassembly
 RUN git clone https://github.com/radareorg/radare2.git && cd radare2 && sys/install.sh && cd /home
@@ -57,11 +79,6 @@ RUN pip install toml && \
     pip install appdirs
 RUN git clone https://github.com/Tib3rius/AutoRecon.git
 
-# feroxbuster
-# Recursive web app directory discovery tool
-RUN git clone https://github.com/epi052/feroxbuster.git
-RUN /home/feroxbuster/install-nix.sh
-
 # Privilege Escalation Awesome Scripts Suite
 # Upload these scripts to exploited hosts and run to discover potential vectors of privesc
 RUN git clone https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite.git
@@ -70,9 +87,11 @@ RUN git clone https://github.com/carlospolop/privilege-escalation-awesome-script
 # Automated scan for potential privesc
 RUN git clone https://github.com/diego-treitos/linux-smart-enumeration.git
 
-# overflow_with_joy
-# Linux stack-based buffer overflow practice repo
-RUN git clone https://github.com/LauraWartschinski/overflow_with_joy.git
+# Reverse Shell Generation Tool
+RUN git clone https://github.com/Lukashku/shellgen.git
+
+# Enum4Linux
+RUN git clone https://github.com/CiscoCXSecurity/enum4linux.git
 
 # Clean up
 RUN apt-get autoremove -y && \
@@ -85,4 +104,6 @@ EXPOSE 22 80 8080
 RUN echo "PS1='🏴‍☠️ \[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
 
 
-
+# alias build_ctf_container='sudo docker build . -t ctf_image'
+# alias run_ctf_container='sudo docker run --name ctf1 -it -d --cap-add=NET_ADMIN --device /dev/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 ctf_image "/bin/bash"'
+# alias enter_ctf_container='sudo docker exec -it ctf1 "/bin/bash"'
