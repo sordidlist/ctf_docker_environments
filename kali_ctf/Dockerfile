@@ -36,7 +36,7 @@ RUN apt-get install -y gnupg && \
 
 
 # First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
-RUN apt-get install apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra iputils-ping john ltrace nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 python3-pip python3-setuptools qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
+RUN apt-get install -y apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra iputils-ping john ltrace nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 python3-pip python3-setuptools qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
 
 RUN pip3 install jwt
 
