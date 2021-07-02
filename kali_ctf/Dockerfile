@@ -101,9 +101,14 @@ RUN apt-get autoremove -y && \
 EXPOSE 22 80 8080
 
 # Reconfigure the shell prompt to have useful info and fancy colors
-RUN echo "PS1='🏴‍☠️ \[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
+RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
 
 
 # alias build_ctf_container='sudo docker build . -t ctf_image'
+# alias build_ctf_container_clean='sudo docker build . --no-cache -t ctf_image'
 # alias run_ctf_container='sudo docker run --name ctf1 -it -d --cap-add=NET_ADMIN --device /dev/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 ctf_image "/bin/bash"'
 # alias enter_ctf_container='sudo docker exec -it ctf1 "/bin/bash"'
+
+# An alias to make using feroxbuster easier
+# Usage: $ ctf_ferox -u http://<TARGET_IP>
+RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc
