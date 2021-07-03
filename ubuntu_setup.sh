@@ -26,7 +26,7 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io
 
 # Various tools
-sudo apt-get install cherrytree python3-pip git flameshot xclip
+sudo apt-get install cherrytree python3-pip git flameshot xclip mlocate
 
 # Pwncat
 pip install git+https://github.com/calebstewart/pwncat.git
