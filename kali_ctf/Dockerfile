@@ -36,7 +36,7 @@ RUN apt-get install -y gnupg && \
 
 
 # First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
-RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra iptables iputils-ping john ltrace mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
+RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra iptables iputils-ping john ltrace mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
 
 
 # Install python2 and necessary modules
@@ -56,7 +56,7 @@ RUN git clone git://github.com/kennethreitz/requests.git && \
 RUN apt-get install -y python3-setuptools && \
     apt-get install -y python3-pip && \
     pip install requests
-RUN pip3 install jwt
+RUN pip3 install jwt pwntools
 
 
 # Install Metasploit Framework
