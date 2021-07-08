@@ -1,18 +1,18 @@
 # Terminator Terminal
 sudo add-apt-repository ppa:gnome-terminator
-sudo apt-get update
-sudo apt-get install terminator
+sudo apt-get update -y
+sudo apt-get install -y terminator
 
 # Sublime Text Editor
 wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
-sudo apt-get install apt-transport-https
+sudo apt-get install -y apt-transport-https
 echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
-sudo apt-get update
-sudo apt-get install sublime-text
+sudo apt-get update -y
+sudo apt-get install -y sublime-text
 
 # Docker
-sudo apt-get update
-sudo apt-get install \
+sudo apt-get update -y
+sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -22,11 +22,11 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 echo \
   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get update -y
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
 # Various tools
-sudo apt-get install cherrytree python3-pip git flameshot xclip mlocate
+sudo apt-get install -y cherrytree python3-pip git flameshot xclip mlocate
 
 # Pwncat
 pip install git+https://github.com/calebstewart/pwncat.git
@@ -41,7 +41,7 @@ alias enter_ctf_container='sudo docker exec -it ctf1 \"/bin/bash\"'" >> ~/.bashr
 
 # Install Microsoft Powershell
 # Update the list of packages
-sudo apt-get update
+sudo apt-get update -y
 # Install pre-requisite packages.
 sudo apt-get install -y wget apt-transport-https software-properties-common
 # Download the Microsoft repository GPG keys
@@ -49,7 +49,7 @@ wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-pr
 # Register the Microsoft repository GPG keys
 sudo dpkg -i packages-microsoft-prod.deb
 # Update the list of packages after we added packages.microsoft.com
-sudo apt-get update
+sudo apt-get update -y
 # Install PowerShell
 sudo apt-get install -y powershell
 # Start PowerShell
