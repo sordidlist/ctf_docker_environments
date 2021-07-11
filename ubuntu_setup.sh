@@ -1,7 +1,6 @@
 release=$(lsb_release -cs)
 #if ($release == 'kali rolling')
 
-
 # Terminator Terminal
 sudo add-apt-repository ppa:gnome-terminator
 sudo apt-get update -y
