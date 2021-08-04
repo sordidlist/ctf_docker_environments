@@ -78,7 +78,7 @@ rm -rf ./usr; rm control.tar.xz data.tar zenith_0.12.0-1_amd64.deb ./debian-bina
 cd ~/Tools;
 
 # bottom (alternative to top, interactive)
-cargo install serial-monitor
+cargo install bottom
 
 # dust Rust-based file size visualizer
 cargo install du-dust
