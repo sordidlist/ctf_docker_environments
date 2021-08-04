@@ -60,6 +60,9 @@ sudo apt-get install -y powershell
 # Start PowerShell
 # pwsh
 
+# JetBrains Toolbox
+cd ~/Tools
+wget https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.21.9547.tar.gz
 
 # Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
