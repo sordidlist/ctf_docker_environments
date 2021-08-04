@@ -11,10 +11,6 @@ RUN rm -fR /var/lib/apt/ && \
     apt-get upgrade -y
 
 
-## TODO
-## Should maybe not necessarily run all of the following as root even in a Docker container (r2 complains about this for instance)
-
-
 # Add NodeJS repo and install
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
 
@@ -24,11 +20,7 @@ RUN apt-get install -y gnupg && \
     echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list && \
     echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
     echo "# deb-src http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list && \
-    # echo "deb http://http.kali.org/kali sana main non-free contrib" >> /etc/apt/sources.list && \
-    # echo "deb http://security.kali.org/kali-security sana/updates main contrib non-free" >> /etc/apt/sources.list && \
     echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
-    # echo "# deb-src http://http.kali.org/kali sana main non-free contrib" >> /etc/apt/sources.list && \
-    # echo "# deb-src http://security.kali.org/kali-security sana/updates main contrib non-free" >> /etc/apt/sources.list && \
     echo "deb http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list && \
     echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
     echo "# deb-src http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list && \
@@ -36,7 +28,7 @@ RUN apt-get install -y gnupg && \
 
 
 # First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
-RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
+RUN apt-get install -y 2to3 apt-utils bat build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
 
 
 # Install python2 and necessary modules
@@ -93,11 +85,19 @@ RUN pip install git+https://github.com/calebstewart/pwncat.git
 RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
 
+# Homebrew package manager
+RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dtool development tool (like cyber chef but local and via CLI)
+RUN brew install guoxbin/guoxbin/dtool
+
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
-RUN pip install toml && \
-    pip install appdirs
-RUN git clone https://github.com/Tib3rius/AutoRecon.git
+RUN git clone --branch beta https://github.com/Tib3rius/AutoRecon && \
+    apt install seclists curl enum4linux feroxbuster nbtscan nikto nmap onesixtyone oscanner smbclient smbmap snmp sslscan sipvicious tnscmd10g whatweb && \
+    # apt install wkhtmltopdf && \
+    cd AutoRecon && \
+    python3 -m pip install -r requirements.txt
 
 # Privilege Escalation Awesome Scripts Suite
 # Upload these scripts to exploited hosts and run to discover potential vectors of privesc
@@ -112,6 +112,18 @@ RUN git clone https://github.com/Lukashku/shellgen.git
 
 # Enum4Linux
 RUN git clone https://github.com/CiscoCXSecurity/enum4linux.git
+
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# tldr Shortened simplified man pages
+RUN cargo install tealdeer
+
+# kmon Linux Kernel monitor/interaction tool
+cargo install kmon
+
+# indexa interactive file system index tool
+cargo install --git https://github.com/mosmeh/indexa
 
 
 # Install Microsoft Powershell
@@ -128,7 +140,6 @@ RUN apt-get update && \
         # Install PowerShell
     apt-get install -y powershell
 
-
 # Clean up
 RUN apt-get autoremove -y && \
     apt-get clean 
@@ -138,12 +149,6 @@ EXPOSE 22 80 8080
 
 # Reconfigure the shell prompt to have useful info and fancy colors
 RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
-
-
-# alias build_ctf_container='sudo docker build . -t ctf_image'
-# alias build_ctf_container_clean='sudo docker build . --no-cache -t ctf_image'
-# alias run_ctf_container='sudo docker run --name ctf1 -it -d --cap-add=NET_ADMIN --device /dev/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 ctf_image "/bin/bash"'
-# alias enter_ctf_container='sudo docker exec -it ctf1 "/bin/bash"'
 
 # An alias to make using feroxbuster easier
 # Usage: $ ctf_ferox -u http://<TARGET_IP>
