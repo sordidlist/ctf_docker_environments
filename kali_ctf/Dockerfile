@@ -1,18 +1,28 @@
-FROM ubuntu:latest
+FROM debian:latest
+
+# Add user
+RUN useradd -m -s /bin/bash linuxbrew && \
+    echo 'sordidlist ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+RUN useradd -m -s /bin/bash sordidlist && \
+    echo 'sordidlist ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER sordidlist
 
 # Configure debian
 ENV DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
 ENV TERM xterm-256color
 
 # Get package cache and upgrade packages
+USER root
 RUN rm -fR /var/lib/apt/ && \
     apt-get clean && \
     apt-get update -y && \
     apt-get upgrade -y
 
-
 # Add NodeJS repo and install
-RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
+RUN apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 
 # Add Kali package sources to /etc/apt/sources and import the public key
 RUN apt-get install -y gnupg && \
@@ -28,26 +38,32 @@ RUN apt-get install -y gnupg && \
 
 
 # First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
-RUN apt-get install -y 2to3 apt-utils bat build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm yarnpkg zsh zstd
+RUN apt-get install -y 2to3 apt-utils bat build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
+
+# Second batch of tools
+RUN apt-get install -y mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
 
 
 # Install python2 and necessary modules
 RUN apt-get update -y && \
     apt-get install -y python2 && \
-    apt-get install -y python-pip && \
-    apt-get update -y
+    wget https://bootstrap.pypa.io/pip/2.7/get-pip.py && \
+    python2 get-pip.py && \
+    rm get-pip.py
 RUN git clone git://github.com/kennethreitz/requests.git && \
     cd requests && \
-    python ./setup.py install && \
+    python2 ./setup.py install && \
     cd ../ && \
     rm -rf requests && \
     apt-get update -y
 
+# Tools that depend on python2
+#RUN apt-get install yarnpkg
 
 # Install python3 and necessary modules
 RUN apt-get install -y python3-setuptools && \
     apt-get install -y python3-pip && \
-    pip install requests
+    pip3 install requests
 RUN pip3 install jwt pwntools
 
 
@@ -73,26 +89,43 @@ WORKDIR /home
 # radare2 for binary reverse engineering and disassembly
 RUN git clone https://github.com/radareorg/radare2.git && cd radare2 && sys/install.sh && cd /home
 
+
+USER sordidlist
+
 # ghidra binary decompile plugin for radare2
 RUN /home/radare2/binr/r2pm/r2pm init
 RUN /home/radare2/binr/r2pm/r2pm -ci r2ghidra
 
 # pwncat post-exploitation framework by calebstewart (there is more than one major project called pwncat)
 # Stabilizes unstable reverse shells, establishes real tty, facilitates file transfers between exploited hosts
-RUN pip install git+https://github.com/calebstewart/pwncat.git
+RUN pip3 install git+https://github.com/calebstewart/pwncat.git
 
 # Searchsploit exploit search tool
+USER root
 RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
 
 # Homebrew package manager
+RUN apt-get update && \
+    apt-get install build-essential curl file git ruby-full locales --no-install-recommends -y && \
+    rm -rf /var/lib/apt/lists/*
+
+    # Homebrew complains if we don't add localedef
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8
+
+USER linuxbrew
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+USER root
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
+
 # Install dtool development tool (like cyber chef but local and via CLI)
+USER linuxbrew
 RUN brew install guoxbin/guoxbin/dtool
 
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
+USER root
 RUN git clone --branch beta https://github.com/Tib3rius/AutoRecon && \
     apt install seclists curl enum4linux feroxbuster nbtscan nikto nmap onesixtyone oscanner smbclient smbmap snmp sslscan sipvicious tnscmd10g whatweb && \
     # apt install wkhtmltopdf && \
@@ -114,16 +147,14 @@ RUN git clone https://github.com/Lukashku/shellgen.git
 RUN git clone https://github.com/CiscoCXSecurity/enum4linux.git
 
 # Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh && \
+    PATH=$PATH:/root/.cargo/bin
 
 # tldr Shortened simplified man pages
 RUN cargo install tealdeer
 
-# kmon Linux Kernel monitor/interaction tool
-cargo install kmon
-
 # indexa interactive file system index tool
-cargo install --git https://github.com/mosmeh/indexa
+RUN cargo install --git https://github.com/mosmeh/indexa
 
 
 # Install Microsoft Powershell
