@@ -9,6 +9,13 @@ sudo add-apt-repository ppa:gnome-terminator
 sudo apt-get update -y
 sudo apt-get install -y terminator
 
+# LSD alternative to ls
+wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb
+sudo dpkg -i lsd_0.20.1_amd64.deb
+rm lsd_0.20.1_amd64.deb
+echo "alias ls='lsd'" >> ~/.bashrc
+
+
 # Sublime Text Editor
 wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
 sudo apt-get install -y apt-transport-https
@@ -97,6 +104,10 @@ cargo install tickrs
 
 # USB interaction tool
 cargo install serial-monitor
+
+# fdfind alternative to find
+cargo install fd-find
+echo "alias find='fdfind'" >> ~/.bashrc
 
 # dtool is a Rust based package for calculating hashes, encrypting files, and other development tasks
 brew install guoxbin/guoxbin/dtool

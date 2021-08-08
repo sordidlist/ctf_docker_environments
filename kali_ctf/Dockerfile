@@ -156,6 +156,13 @@ RUN cargo install tealdeer
 # indexa interactive file system index tool
 RUN cargo install --git https://github.com/mosmeh/indexa
 
+# LSD alternative to ls
+RUN wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb && \
+    dpkg -i lsd_0.20.1_amd64.deb && \
+    rm lsd_0.20.1_amd64.deb
+
+# fdfind alternative to find
+RUN cargo install fd-find
 
 # Install Microsoft Powershell
         # Update the list of packages
@@ -187,3 +194,9 @@ RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,a
 
 # An alias to make starting AutoRecon faster
 RUN echo "alias ctf_autorecon='cd /home/AutoRecon/src/autorecon; python3 autorecon.py '" >> ~/.bashrc
+
+# An alias to make lsd the default
+RUN echo "alias ls='lsd'" >> ~/.bashrc
+
+# An alias to make fdfind the default
+RUN echo "alias find='fdfind'" >> ~/.bashrc
