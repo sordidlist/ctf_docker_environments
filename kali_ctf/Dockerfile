@@ -2,7 +2,7 @@ FROM debian:latest
 
 # Add user
 RUN useradd -m -s /bin/bash linuxbrew && \
-    echo 'sordidlist ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+    echo 'linuxbrew ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN useradd -m -s /bin/bash sordidlist && \
     echo 'sordidlist ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
