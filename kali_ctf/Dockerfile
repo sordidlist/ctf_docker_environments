@@ -73,22 +73,11 @@ RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/conf
     ./msfinstall
 
 
-# WordPress scanner
-#RUN apt-add-repository -y ppa:rael-gc/rvm && \
-#    apt-get update -y && \
-#    apt-get install -y rvm && \
-#    usermod -a -G rvm $USER && \
-#    rvm user gemsets && \
-#    rvm install ruby && \
-#    gem install wpscan
-
-
 # Clone some tools fron github to our home dir
 WORKDIR /home
 
 # radare2 for binary reverse engineering and disassembly
 RUN git clone https://github.com/radareorg/radare2.git && cd radare2 && sys/install.sh && cd /home
-
 
 USER sordidlist
 
