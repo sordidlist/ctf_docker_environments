@@ -123,6 +123,9 @@ ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 USER linuxbrew
 RUN brew install guoxbin/guoxbin/dtool
 
+# Install wpscan WordPress scanning tool
+RUN brew install wpscanteam/tap/wpscan
+
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
 USER root
