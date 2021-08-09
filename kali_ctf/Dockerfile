@@ -156,6 +156,9 @@ RUN wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd
 # fdfind alternative to find
 RUN cargo install fd-find
 
+# tiny IRC clinet
+RUN cargo install --git https://github.com/osa1/tiny
+
 # Install Microsoft Powershell
         # Update the list of packages
 RUN apt-get update && \
