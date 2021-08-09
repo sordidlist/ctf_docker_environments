@@ -41,7 +41,7 @@ RUN apt-get install -y gnupg && \
 RUN apt-get install -y 2to3 apt-utils bat build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
 
 # Second batch of tools
-RUN apt-get install -y mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
+RUN apt-get install -y mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
 
 
 # Install python2 and necessary modules
