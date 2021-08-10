@@ -72,6 +72,12 @@ RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/conf
     chmod 755 msfinstall && \
     ./msfinstall
 
+# Install mysql
+RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.18-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
+    apt-get update && \
+    apt-get install mysql-server
+
 
 # Clone some tools fron github to our home dir
 WORKDIR /home
