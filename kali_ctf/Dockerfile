@@ -38,7 +38,7 @@ RUN apt-get install -y gnupg && \
 RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
 
 # Second batch of tools
-RUN apt-get install -y mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
+RUN apt-get install -y man mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
 
 # Install python2 and necessary modules
 RUN apt-get update -y && \
@@ -145,10 +145,12 @@ RUN git clone https://github.com/Lukashku/shellgen.git
 RUN git clone https://github.com/CiscoCXSecurity/enum4linux.git
 
 # Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh && \
+    PATH=$PATH:/root/.cargo/bin
 
 # tldr Shortened simplified man pages
-RUN cargo install tealdeer
+RUN cargo install tealdeer && \
+    echo "alias tldr='/root/.cargo/bin/tldr'" >> ~/.bashrc
 
 # indexa interactive file system index tool
 RUN cargo install --git https://github.com/mosmeh/indexa
@@ -162,9 +164,6 @@ RUN wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd
 # fdfind alternative to find
 RUN cargo install fd-find && \
     echo "alias find='fdfind'" >> ~/.bashrc
-
-# Add rust binaries path to $PATH env variable
-RUN PATH=$PATH:/root/.cargo/bin
 
 # tiny IRC clinet
 RUN cargo install --git https://github.com/osa1/tiny
