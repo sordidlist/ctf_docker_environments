@@ -1,13 +1,10 @@
 FROM debian:latest
 
-# Add user
+# Add non-root users for some installations
 RUN useradd -m -s /bin/bash linuxbrew && \
     echo 'linuxbrew ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
 RUN useradd -m -s /bin/bash sordidlist && \
     echo 'sordidlist ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-USER sordidlist
 
 # Configure debian
 ENV DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
@@ -25,6 +22,7 @@ RUN apt-get install -y curl
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 
 # Add Kali package sources to /etc/apt/sources and import the public key
+# This allows for installing tools normally distributed with the Kali Linux OS using apt
 RUN apt-get install -y gnupg && \
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com ED444FF07D8D0BF6 && \
     echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list && \
@@ -36,13 +34,11 @@ RUN apt-get install -y gnupg && \
     echo "# deb-src http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list && \
     apt-get update -y
 
-
 # First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
-RUN apt-get install -y 2to3 apt-utils bat build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
+RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
 
 # Second batch of tools
 RUN apt-get install -y mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
-
 
 # Install python2 and necessary modules
 RUN apt-get update -y && \
@@ -57,15 +53,13 @@ RUN git clone git://github.com/kennethreitz/requests.git && \
     rm -rf requests && \
     apt-get update -y
 
-# Tools that depend on python2
-#RUN apt-get install yarnpkg
-
 # Install python3 and necessary modules
 RUN apt-get install -y python3-setuptools && \
     apt-get install -y python3-pip && \
     pip3 install requests
-RUN pip3 install jwt pwntools
 
+# Install pwntools python3 package for exploit writing
+RUN pip3 install jwt pwntools
 
 # Install Metasploit Framework
 RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && \
@@ -76,8 +70,7 @@ RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/conf
 RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.18-1_all.deb && \
     dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
     apt-get update && \
-    apt-get install mysql-server
-
+    apt-get install -y mysql-server
 
 # Clone some tools fron github to our home dir
 WORKDIR /home
@@ -85,9 +78,8 @@ WORKDIR /home
 # radare2 for binary reverse engineering and disassembly
 RUN git clone https://github.com/radareorg/radare2.git && cd radare2 && sys/install.sh && cd /home
 
-USER sordidlist
-
 # ghidra binary decompile plugin for radare2
+USER sordidlist
 RUN /home/radare2/binr/r2pm/r2pm init
 RUN /home/radare2/binr/r2pm/r2pm -ci r2ghidra
 
@@ -100,17 +92,21 @@ USER root
 RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
 
-# Homebrew package manager
+# bat (alternative to cat)
+RUN wget https://github.com/sharkdp/bat/releases/download/v0.18.2/bat_0.18.2_amd64.deb && \
+    dpkg -i bat_0.18.2_amd64.deb  # adapt version number and architecture && \
+    rm bat_0.18.2_amd64.deb && \
+    echo "alias cat='bat'" >> ~/.bashrc
+
+# Install homebrew package manager
 RUN apt-get update && \
     apt-get install build-essential curl file git ruby-full locales --no-install-recommends -y && \
     rm -rf /var/lib/apt/lists/*
-
     # Homebrew complains if we don't add localedef
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
-
+    # Complete the homebrew install
 USER linuxbrew
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
 USER root
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:${PATH}"
 
@@ -121,6 +117,9 @@ RUN brew install guoxbin/guoxbin/dtool
 # Install wpscan WordPress scanning tool
 RUN brew install wpscanteam/tap/wpscan
 
+# Install ripgrep (grep alternative)
+RUN brew install ripgrep
+
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
 USER root
@@ -128,7 +127,8 @@ RUN git clone --branch beta https://github.com/Tib3rius/AutoRecon && \
     apt install seclists curl enum4linux feroxbuster nbtscan nikto nmap onesixtyone oscanner smbclient smbmap snmp sslscan sipvicious tnscmd10g whatweb && \
     # apt install wkhtmltopdf && \
     cd AutoRecon && \
-    python3 -m pip install -r requirements.txt
+    python3 -m pip install -r requirements.txt && \
+    echo "alias ctf_autorecon='cd /home/AutoRecon/src/autorecon; python3 autorecon.py '" >> ~/.bashrc
 
 # Privilege Escalation Awesome Scripts Suite
 # Upload these scripts to exploited hosts and run to discover potential vectors of privesc
@@ -145,8 +145,7 @@ RUN git clone https://github.com/Lukashku/shellgen.git
 RUN git clone https://github.com/CiscoCXSecurity/enum4linux.git
 
 # Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh && \
-    PATH=$PATH:/root/.cargo/bin
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
 
 # tldr Shortened simplified man pages
 RUN cargo install tealdeer
@@ -157,10 +156,15 @@ RUN cargo install --git https://github.com/mosmeh/indexa
 # LSD alternative to ls
 RUN wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb && \
     dpkg -i lsd_0.20.1_amd64.deb && \
-    rm lsd_0.20.1_amd64.deb
+    rm lsd_0.20.1_amd64.deb && \
+    echo "alias ls='lsd'" >> ~/.bashrc
 
 # fdfind alternative to find
-RUN cargo install fd-find
+RUN cargo install fd-find && \
+    echo "alias find='fdfind'" >> ~/.bashrc
+
+# Add rust binaries path to $PATH env variable
+RUN PATH=$PATH:/root/.cargo/bin
 
 # tiny IRC clinet
 RUN cargo install --git https://github.com/osa1/tiny
@@ -204,12 +208,3 @@ RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32
 # An alias to make using feroxbuster easier
 # Usage: $ ctf_ferox -u http://<TARGET_IP>
 RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc
-
-# An alias to make starting AutoRecon faster
-RUN echo "alias ctf_autorecon='cd /home/AutoRecon/src/autorecon; python3 autorecon.py '" >> ~/.bashrc
-
-# An alias to make lsd the default
-RUN echo "alias ls='lsd'" >> ~/.bashrc
-
-# An alias to make fdfind the default
-RUN echo "alias find='fdfind'" >> ~/.bashrc
