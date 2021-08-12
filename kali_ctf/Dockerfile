@@ -94,7 +94,7 @@ RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
 
 # bat (alternative to cat)
 RUN wget https://github.com/sharkdp/bat/releases/download/v0.18.2/bat_0.18.2_amd64.deb && \
-    dpkg -i bat_0.18.2_amd64.deb  # adapt version number and architecture && \
+    dpkg -i bat_0.18.2_amd64.deb && \
     rm bat_0.18.2_amd64.deb
 
 # Install homebrew package manager
@@ -117,7 +117,8 @@ RUN brew install guoxbin/guoxbin/dtool
 RUN brew install wpscanteam/tap/wpscan
 
 # Install ripgrep (grep alternative)
-RUN brew install ripgrep
+RUN brew install ripgrep && \
+    echo "alias grep=rg'" >> ~/.bashrc
 
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
