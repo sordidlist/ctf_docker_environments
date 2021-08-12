@@ -95,8 +95,7 @@ RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
 # bat (alternative to cat)
 RUN wget https://github.com/sharkdp/bat/releases/download/v0.18.2/bat_0.18.2_amd64.deb && \
     dpkg -i bat_0.18.2_amd64.deb  # adapt version number and architecture && \
-    rm bat_0.18.2_amd64.deb && \
-    echo "alias cat='bat'" >> ~/.bashrc
+    rm bat_0.18.2_amd64.deb
 
 # Install homebrew package manager
 RUN apt-get update && \
