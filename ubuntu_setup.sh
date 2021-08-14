@@ -1,5 +1,17 @@
 release=$(lsb_release -cs)
-#if ($release == 'kali rolling')
+if [ "$release" != "kali rolling" ]
+then
+    # Import Kali Linux public keys
+    sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com ED444FF07D8D0BF6
+    sudo echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list
+    sudo echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list
+    sudo echo "# deb-src http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list
+    sudo echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list
+    sudo echo "deb http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list
+    sudo echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list
+    sudo echo "# deb-src http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list
+    sudo apt-get update -y
+fi
 
 #Ensure Tools directory has been created (it should be this directory's parent directory)
 cd ~/Tools
@@ -112,3 +124,5 @@ echo "alias find='fdfind'" >> ~/.bashrc
 # dtool is a Rust based package for calculating hashes, encrypting files, and other development tasks
 brew install guoxbin/guoxbin/dtool
 
+# Redis tools
+sudo apt-get install -y redis-tools

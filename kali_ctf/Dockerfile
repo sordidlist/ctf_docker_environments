@@ -25,7 +25,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 # This allows for installing tools normally distributed with the Kali Linux OS using apt
 RUN apt-get install -y gnupg && \
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com ED444FF07D8D0BF6 && \
-    echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list" && \
     echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
     echo "# deb-src http://http.kali.org/kali kali-rolling main contrib non-free" >> /etc/apt/sources.list && \
     echo "# For source package access, uncomment the following line" >> /etc/apt/sources.list && \
