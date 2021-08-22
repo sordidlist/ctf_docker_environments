@@ -38,7 +38,7 @@ RUN apt-get install -y gnupg && \
 RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
 
 # Second batch of tools
-RUN apt-get install -y man mlocate nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
+RUN apt-get install -y man mlocate mysql-client nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser rsync seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
 
 # Install python2 and necessary modules
 RUN apt-get update -y && \
@@ -66,12 +66,6 @@ RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/conf
     chmod 755 msfinstall && \
     ./msfinstall
 
-# Install mysql
-RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.18-1_all.deb && \
-    dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
-    apt-get update && \
-    apt-get install -y mysql-server
-
 # Clone some tools fron github to our home dir
 WORKDIR /home
 
@@ -90,7 +84,8 @@ RUN pip3 install git+https://github.com/calebstewart/pwncat.git
 # Searchsploit exploit search tool
 USER root
 RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
-RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc
+RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc && \
+    echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.zshrc
 
 # bat (alternative to cat)
 RUN wget https://github.com/sharkdp/bat/releases/download/v0.18.2/bat_0.18.2_amd64.deb && \
@@ -118,7 +113,8 @@ RUN brew install wpscanteam/tap/wpscan
 
 # Install ripgrep (grep alternative)
 RUN brew install ripgrep && \
-    echo "alias grep=rg'" >> ~/.bashrc
+    echo "alias grep=rg'" >> ~/.bashrc && \
+    echo "alias grep=rg'" >> ~/.zshrc
 
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
@@ -145,12 +141,11 @@ RUN git clone https://github.com/Lukashku/shellgen.git
 RUN git clone https://github.com/CiscoCXSecurity/enum4linux.git
 
 # Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh && \
-    PATH=$PATH:/root/.cargo/bin
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
+ENV PATH=$PATH:/root/.cargo/bin
 
 # tldr Shortened simplified man pages
-RUN cargo install tealdeer && \
-    echo "alias tldr='/root/.cargo/bin/tldr'" >> ~/.bashrc
+RUN cargo install tealdeer
 
 # indexa interactive file system index tool
 RUN cargo install --git https://github.com/mosmeh/indexa
@@ -159,11 +154,11 @@ RUN cargo install --git https://github.com/mosmeh/indexa
 RUN wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb && \
     dpkg -i lsd_0.20.1_amd64.deb && \
     rm lsd_0.20.1_amd64.deb && \
-    echo "alias ls='lsd'" >> ~/.bashrc
+    echo "alias ls='lsd -lA'" >> ~/.bashrc && \
+    echo "alias ls='lsd -lA'" >> ~/.zshrc
 
 # fdfind alternative to find
-RUN cargo install fd-find && \
-    echo "alias find='fdfind'" >> ~/.bashrc
+RUN cargo install fd-find
 
 # tiny IRC clinet
 RUN cargo install --git https://github.com/osa1/tiny
@@ -189,10 +184,29 @@ RUN apt-get autoremove -y && \
 # Expose ports for shinanegans
 EXPOSE 22 80 8080
 
-# Reconfigure the shell prompt to have useful info and fancy colors
-RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc
+# An alias to make using feroxbuster easier
+# Usage: $ ctf_ferox -u http://<TARGET_IP>
+RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc && \
+    echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.zshrc
 
-# The Sublime Text Color Highlighter plugin will highlight these values with their corresponding colors
+# Set up liquidprompt
+RUN git clone --branch stable https://github.com/nojhan/liquidprompt.git ~/liquidprompt && \
+    echo "source /root/liquidprompt/liquidprompt" >> ~/.bashrc && \
+    echo "source /root/liquidprompt/liquidprompt" >> ~/.zshrc && \
+    echo "source /root/liquidprompt/themes/powerline/powerline.theme" >> ~/.bashrc && \
+    echo "source /root/liquidprompt/themes/powerline/powerline.theme" >> ~/.zhrc && \
+    echo "lp_theme powerline" >> ~/.bashrc && \
+    echo "lp_theme powerline" >> ~/.zshrc
+
+# Update locate database
+RUN updatedb
+
+# Reconfigure the shell prompt to have useful info and fancy colors
+# Note: I suspect that this configuration is what causes bash to occasionally glitch and require you to run 'reset'
+# RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc && \
+#    echo "PS1='$\e[0;32m[\e[0;31m\u\e[33m\e[0m'" >> ~/.zshrc
+
+# The Sublime Text Color Highlight plugin will highlight these values with their corresponding colors
 # below and in the reconfigure command above, making interpreting the colors much easier.
 # \e[30m]
 # \e[31m]
@@ -203,7 +217,3 @@ RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32
 # \e[36m]
 # \e[37m]
 
-
-# An alias to make using feroxbuster easier
-# Usage: $ ctf_ferox -u http://<TARGET_IP>
-RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc
