@@ -126,3 +126,16 @@ brew install guoxbin/guoxbin/dtool
 
 # Redis tools
 sudo apt-get install -y redis-tools
+
+# Liquidprompt
+git clone --branch stable https://github.com/nojhan/liquidprompt.git ~/liquidprompt
+source ~/liquidprompt/liquidprompt
+echo "# Only load Liquidprompt in interactive shells, not from a script or from scp\n
+[[ $- = *i* ]] && source ~/liquidprompt/liquidprompt" >> ~/.bashrc
+echo "# Only load Liquidprompt in interactive shells, not from a script or from scp\n
+[[ $- = *i* ]] && source ~/liquidprompt/liquidprompt" >> ~/.zshrc
+cd ~/liquidprompt
+echo "source themes/powerline/powerline.theme" >> ~/.bashrc
+echo "source themes/powerline/powerline.theme" >> ~/.zshrc
+echo "lp_theme powerline_full" >> ~/.bashrc
+echo "lp_theme powerline_full" >> ~/.zshrc

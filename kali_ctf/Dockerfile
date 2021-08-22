@@ -38,7 +38,7 @@ RUN apt-get install -y gnupg && \
 RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
 
 # Second batch of tools
-RUN apt-get install -y man mlocate mysql-client nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser rsync seclists sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
+RUN apt-get install -y man mlocate mysql-client nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser rsync seclists sed sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
 
 # Install python2 and necessary modules
 RUN apt-get update -y && \
@@ -189,20 +189,25 @@ EXPOSE 22 80 8080
 RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc && \
     echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.zshrc
 
+
+# Oh My Zsh!
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
+    sed -i 's/robbyrussell/random/g' ~/.zshrc
+
 # Set up liquidprompt
-RUN git clone --branch stable https://github.com/nojhan/liquidprompt.git ~/liquidprompt && \
-    echo "source /root/liquidprompt/liquidprompt" >> ~/.bashrc && \
-    echo "source /root/liquidprompt/liquidprompt" >> ~/.zshrc && \
-    echo "source /root/liquidprompt/themes/powerline/powerline.theme" >> ~/.bashrc && \
-    echo "source /root/liquidprompt/themes/powerline/powerline.theme" >> ~/.zhrc && \
-    echo "lp_theme powerline" >> ~/.bashrc && \
-    echo "lp_theme powerline" >> ~/.zshrc
+# Note: liquidprompt doesn't appear to track path changes inside Docker containers at the moment, disabling :(
+#RUN git clone --branch stable https://github.com/nojhan/liquidprompt.git ~/liquidprompt && \
+#    echo "source /root/liquidprompt/liquidprompt" >> ~/.bashrc && \
+#    echo "source /root/liquidprompt/liquidprompt" >> ~/.zshrc && \
+#    echo "source /root/liquidprompt/themes/powerline/powerline.theme" >> ~/.bashrc && \
+#    echo "source /root/liquidprompt/themes/powerline/powerline.theme" >> ~/.zhrc && \
+#    echo "lp_theme powerline" >> ~/.bashrc && \
+#    echo "lp_theme powerline" >> ~/.zshrc
 
 # Update locate database
 RUN updatedb
 
 # Reconfigure the shell prompt to have useful info and fancy colors
-# Note: I suspect that this configuration is what causes bash to occasionally glitch and require you to run 'reset'
 # RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc && \
 #    echo "PS1='$\e[0;32m[\e[0;31m\u\e[33m\e[0m'" >> ~/.zshrc
 
