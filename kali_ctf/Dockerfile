@@ -17,8 +17,16 @@ RUN rm -fR /var/lib/apt/ && \
     apt-get update -y && \
     apt-get upgrade -y
 
-# Add NodeJS repo and install
+# Need curl before we can do a lot of things
 RUN apt-get install -y curl
+
+# Oh My Zsh!
+RUN apt-get install -y git zsh && \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
+    cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
+    sed -i 's/robbyrussell/random/g' ~/.zshrc
+
+# Add NodeJS repo and install
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 
 # Add Kali package sources to /etc/apt/sources and import the public key
@@ -189,11 +197,6 @@ EXPOSE 22 80 8080
 RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc && \
     echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.zshrc
 
-
-# Oh My Zsh!
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
-    sed -i 's/robbyrussell/random/g' ~/.zshrc
-
 # Set up liquidprompt
 # Note: liquidprompt doesn't appear to track path changes inside Docker containers at the moment, disabling :(
 #RUN git clone --branch stable https://github.com/nojhan/liquidprompt.git ~/liquidprompt && \
@@ -206,19 +209,3 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 
 # Update locate database
 RUN updatedb
-
-# Reconfigure the shell prompt to have useful info and fancy colors
-# RUN echo "PS1='\[\e[32m\][\[\e[m\]\[\e[31m\]\u\[\e[m\]\[\e[33m\]@\[\e[m\]\[\e[32m\]\h\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\[\e[32;39m\]\\$\[\e[m\] '" >> ~/.bashrc && \
-#    echo "PS1='$\e[0;32m[\e[0;31m\u\e[33m\e[0m'" >> ~/.zshrc
-
-# The Sublime Text Color Highlight plugin will highlight these values with their corresponding colors
-# below and in the reconfigure command above, making interpreting the colors much easier.
-# \e[30m]
-# \e[31m]
-# \e[32m]
-# \e[33m]
-# \e[34m]
-# \e[35m]
-# \e[36m]
-# \e[37m]
-
