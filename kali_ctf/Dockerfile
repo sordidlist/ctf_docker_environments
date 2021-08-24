@@ -21,10 +21,15 @@ RUN rm -fR /var/lib/apt/ && \
 RUN apt-get install -y curl
 
 # Oh My Zsh!
+# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, xiong-chiamiov, ys]
 RUN apt-get install -y git zsh && \
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" && \
-    cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
-    sed -i 's/robbyrussell/random/g' ~/.zshrc
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
+    sed -i 's/robbyrussell/random/g' ~/.zshrc && \
+# Oh My Zsh! plugins
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
+    sed -i 's/git/git zsh-autosuggestions sudo web-search copyfile copybuffer dirhistory zsh_reload history/g' ~/.zshrc
+
 
 # Add NodeJS repo and install
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
@@ -42,11 +47,12 @@ RUN apt-get install -y gnupg && \
     echo "# deb-src http://old.kali.org/kali moto main non-free contrib" >> /etc/apt/sources.list && \
     apt-get update -y
 
-# First batch of tools. Installing these in groups/separate Docker layers to avoid subsequent rebuilds taking forever.
-RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster hashcat hydra ike-scan iptables iputils-ping john ltrace 
-
-# Second batch of tools
-RUN apt-get install -y man mlocate mysql-client nano nbtscan ncat net-tools nikto nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser rsync seclists sed sipvicious smbclient smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm zsh zstd
+# Sets of apt installations
+RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster && \
+    apt-get install -y hashcat hydra ike-scan iptables iputils-ping john ltrace man mlocate mysql-client nano nbtscan ncat net-tools nikto && \
+    apt-get install -y nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser rsync seclists sed sipvicious smbclient  && \
+    apt-get install -y smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm && \
+    apt-get install -y zstd
 
 # Install python2 and necessary modules
 RUN apt-get update -y && \
@@ -153,7 +159,8 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
 ENV PATH=$PATH:/root/.cargo/bin
 
 # tldr Shortened simplified man pages
-RUN cargo install tealdeer
+RUN cargo install tealdeer && \
+    tldr --update
 
 # indexa interactive file system index tool
 RUN cargo install --git https://github.com/mosmeh/indexa

@@ -139,3 +139,6 @@ brew install guoxbin/guoxbin/dtool
 
 # Redis tools
 sudo apt-get install -y redis-tools
+
+# CLI Torrent manager
+sudo apt install transmission-cli
