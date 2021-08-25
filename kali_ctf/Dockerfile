@@ -118,11 +118,7 @@ RUN brew install ripgrep
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
 USER root
-RUN git clone --branch beta https://github.com/Tib3rius/AutoRecon && \
-    apt install seclists curl enum4linux feroxbuster nbtscan nikto nmap onesixtyone oscanner smbclient smbmap snmp sslscan sipvicious tnscmd10g whatweb && \
-    # apt install wkhtmltopdf && \
-    cd AutoRecon && \
-    python3 -m pip install -r requirements.txt
+RUN python3 -m pip install git+https://github.com/Tib3rius/AutoRecon.git
 
 # Privilege Escalation Awesome Scripts Suite
 # Upload these scripts to exploited hosts and run to discover potential vectors of privesc
@@ -195,7 +191,7 @@ EXPOSE 22 80 8080
 RUN updatedb
 
 # Oh My Zsh!
-# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, xiong-chiamiov, ys]
+# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, philips, xiong-chiamiov, ys]
 RUN apt-get install -y git zsh && \
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
@@ -214,8 +210,8 @@ RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,a
 RUN echo "alias ls='lsd -lA'" >> ~/.bashrc && \
     echo "alias ls='lsd -lA'" >> ~/.zshrc
 
-RUN echo "alias grep=rg'" >> ~/.bashrc && \
-    echo "alias grep=rg'" >> ~/.zshrc
+RUN echo "alias grep='rg'" >> ~/.bashrc && \
+    echo "alias grep='rg'" >> ~/.zshrc
 
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc && \
     echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.zshrc

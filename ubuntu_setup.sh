@@ -62,7 +62,7 @@ sudo apt-get update -y
 sudo apt-get install -y docker-ce
 
 # Various tools
-sudo apt-get install -y cherrytree python3-pip git flameshot xclip mlocate
+sudo apt-get install -y cherrytree python3-pip git flameshot xclip mlocate python-dev python3-dev libcap-dev libpcap-dev libssl-dev 
 
 # bat (alternative to cat)
 wget https://github.com/sharkdp/bat/releases/download/v0.18.2/bat_0.18.2_amd64.deb
