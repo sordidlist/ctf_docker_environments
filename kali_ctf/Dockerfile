@@ -20,17 +20,6 @@ RUN rm -fR /var/lib/apt/ && \
 # Need curl before we can do a lot of things
 RUN apt-get install -y curl
 
-# Oh My Zsh!
-# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, xiong-chiamiov, ys]
-RUN apt-get install -y git zsh && \
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
-    sed -i 's/robbyrussell/random/g' ~/.zshrc && \
-# Oh My Zsh! plugins
-    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
-    sed -i 's/git/git zsh-autosuggestions sudo web-search copyfile copybuffer dirhistory zsh_reload history/g' ~/.zshrc
-
-
 # Add NodeJS repo and install
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 
@@ -87,9 +76,9 @@ WORKDIR /home
 RUN git clone https://github.com/radareorg/radare2.git && cd radare2 && sys/install.sh && cd /home
 
 # ghidra binary decompile plugin for radare2
-USER sordidlist
-RUN /home/radare2/binr/r2pm/r2pm init
-RUN /home/radare2/binr/r2pm/r2pm -ci r2ghidra
+#USER sordidlist
+#RUN /home/radare2/binr/r2pm/r2pm init
+#RUN /home/radare2/binr/r2pm/r2pm -ci r2ghidra
 
 # pwncat post-exploitation framework by calebstewart (there is more than one major project called pwncat)
 # Stabilizes unstable reverse shells, establishes real tty, facilitates file transfers between exploited hosts
@@ -98,8 +87,6 @@ RUN pip3 install git+https://github.com/calebstewart/pwncat.git
 # Searchsploit exploit search tool
 USER root
 RUN git clone https://github.com/offensive-security/exploitdb.git /opt/exploit-database
-RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc && \
-    echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.zshrc
 
 # bat (alternative to cat)
 RUN wget https://github.com/sharkdp/bat/releases/download/v0.18.2/bat_0.18.2_amd64.deb && \
@@ -126,9 +113,7 @@ RUN brew install guoxbin/guoxbin/dtool
 RUN brew install wpscanteam/tap/wpscan
 
 # Install ripgrep (grep alternative)
-RUN brew install ripgrep && \
-    echo "alias grep=rg'" >> ~/.bashrc && \
-    echo "alias grep=rg'" >> ~/.zshrc
+RUN brew install ripgrep
 
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
@@ -137,8 +122,7 @@ RUN git clone --branch beta https://github.com/Tib3rius/AutoRecon && \
     apt install seclists curl enum4linux feroxbuster nbtscan nikto nmap onesixtyone oscanner smbclient smbmap snmp sslscan sipvicious tnscmd10g whatweb && \
     # apt install wkhtmltopdf && \
     cd AutoRecon && \
-    python3 -m pip install -r requirements.txt && \
-    echo "alias ctf_autorecon='cd /home/AutoRecon/src/autorecon; python3 autorecon.py '" >> ~/.bashrc
+    python3 -m pip install -r requirements.txt
 
 # Privilege Escalation Awesome Scripts Suite
 # Upload these scripts to exploited hosts and run to discover potential vectors of privesc
@@ -168,9 +152,7 @@ RUN cargo install --git https://github.com/mosmeh/indexa
 # LSD alternative to ls
 RUN wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb && \
     dpkg -i lsd_0.20.1_amd64.deb && \
-    rm lsd_0.20.1_amd64.deb && \
-    echo "alias ls='lsd -lA'" >> ~/.bashrc && \
-    echo "alias ls='lsd -lA'" >> ~/.zshrc
+    rm lsd_0.20.1_amd64.deb
 
 # fdfind alternative to find
 RUN cargo install fd-find
@@ -199,11 +181,6 @@ RUN apt-get autoremove -y && \
 # Expose ports for shinanegans
 EXPOSE 22 80 8080
 
-# An alias to make using feroxbuster easier
-# Usage: $ ctf_ferox -u http://<TARGET_IP>
-RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc && \
-    echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.zshrc
-
 # Set up liquidprompt
 # Note: liquidprompt doesn't appear to track path changes inside Docker containers at the moment, disabling :(
 #RUN git clone --branch stable https://github.com/nojhan/liquidprompt.git ~/liquidprompt && \
@@ -216,3 +193,29 @@ RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,a
 
 # Update locate database
 RUN updatedb
+
+# Oh My Zsh!
+# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, xiong-chiamiov, ys]
+RUN apt-get install -y git zsh && \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
+    sed -i 's/robbyrussell/random/g' ~/.zshrc && \
+# Oh My Zsh! plugins
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
+    sed -i 's/git/git zsh-autosuggestions sudo web-search copyfile copybuffer dirhistory zsh_reload history/g' ~/.zshrc
+
+# Some aliases
+
+# An alias to make using feroxbuster easier
+# Usage: $ ctf_ferox -u http://<TARGET_IP>
+RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc && \
+    echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.zshrc
+
+RUN echo "alias ls='lsd -lA'" >> ~/.bashrc && \
+    echo "alias ls='lsd -lA'" >> ~/.zshrc
+
+RUN echo "alias grep=rg'" >> ~/.bashrc && \
+    echo "alias grep=rg'" >> ~/.zshrc
+
+RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc && \
+    echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.zshrc
