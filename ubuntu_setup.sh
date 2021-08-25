@@ -63,7 +63,11 @@ sudo apt-get install -y docker-ce
 
 # Various tools
 sudo apt-get install -y cherrytree python3-pip git flameshot xclip mlocate
-sudo apt install -y bat
+
+# bat (alternative to cat)
+wget https://github.com/sharkdp/bat/releases/download/v0.18.2/bat_0.18.2_amd64.deb
+dpkg -i bat_0.18.2_amd64.deb
+rm bat_0.18.2_amd64.deb
 
 # Pwncat
 pip install git+https://github.com/calebstewart/pwncat.git
@@ -126,6 +130,9 @@ cargo install --git https://github.com/osa1/tiny
 
 # tickrs Ticker data for CLI
 cargo install tickrs
+
+# indexa file system indexing
+cargo install --git https://github.com/mosmeh/indexa
 
 # USB interaction tool
 cargo install serial-monitor
