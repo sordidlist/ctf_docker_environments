@@ -191,7 +191,8 @@ EXPOSE 22 80 8080
 RUN updatedb
 
 # Oh My Zsh!
-# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, philips, xiong-chiamiov, ys]
+# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, nanotech, philips, xiong-chiamiov, ys]
+# Themes to avoid: [jonathan]
 RUN apt-get install -y git zsh && \
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
@@ -215,3 +216,6 @@ RUN echo "alias grep='rg'" >> ~/.bashrc && \
 
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc && \
     echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.zshrc
+
+# Set timezone
+ENV TZ="America/Denver"
