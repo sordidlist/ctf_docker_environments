@@ -191,17 +191,22 @@ EXPOSE 22 80 8080
 RUN updatedb
 
 # Oh My Zsh!
-# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, nanotech, philips, xiong-chiamiov, ys]
+# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, junkfood, nanotech, philips, xiong-chiamiov, ys]
 # Themes to avoid: [jonathan]
+USER root
 RUN apt-get install -y git zsh && \
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
     sed -i 's/robbyrussell/random/g' ~/.zshrc && \
 # Oh My Zsh! plugins
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
-    sed -i 's/git/git zsh-autosuggestions sudo web-search copyfile copybuffer dirhistory zsh_reload history/g' ~/.zshrc
+        # zsh-syntax-highlighting needs to be the last plugin sourced or things will break, see its readme
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
+    sed -i 's/git/git zsh-autosuggestions sudo web-search copybuffer dirhistory zsh_reload history zsh-syntax-highlighting/g' ~/.zshrc
 
 # Some aliases
+
+RUN sed -i 's/# ENABLE_CORRECTION/ENABLE_CORRECTION/g' ~/.zshrc
 
 # An alias to make using feroxbuster easier
 # Usage: $ ctf_ferox -u http://<TARGET_IP>
@@ -219,3 +224,8 @@ RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc &&
 
 # Set timezone
 ENV TZ="America/Denver"
+
+RUN cp /root/.zshrc /home/sordidlist/.zshrc && \
+    cp -r /root/.oh-my-zsh /home/sordidlist && \
+    cp /root/.zshrc /home/linuxbrew/.zshrc && \
+    cp -r /root/.oh-my-zsh /home/linuxbrew
