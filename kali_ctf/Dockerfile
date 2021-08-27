@@ -40,8 +40,8 @@ RUN apt-get install -y gnupg && \
 RUN apt-get install -y 2to3 apt-utils build-essential cmake colordiff colortail curl enum4linux feroxbuster ftp git gnupg gobuster && \
     apt-get install -y hashcat hydra ike-scan iptables iputils-ping john ltrace man mlocate mysql-client nano nbtscan ncat net-tools nikto && \
     apt-get install -y nmap onesixtyone openvpn oscanner pkg-config proxychains proxychains4 qtchooser rsync seclists sed sipvicious smbclient  && \
-    apt-get install -y smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet tmate tmux tnscmd10g tor unzip vim wget whatweb xterm && \
-    apt-get install -y zstd
+    apt-get install -y smbmap smtp-user-enum snmp snmpcheck sqlite3 sslscan strace telnet timewarrior tmate tmux tnscmd10g tor unzip vim wget && \
+    apt-get install -y whatweb xterm zstd
 
 # Install python2 and necessary modules
 RUN apt-get update -y && \
@@ -191,7 +191,7 @@ EXPOSE 22 80 8080
 RUN updatedb
 
 # Oh My Zsh!
-# Personal favorite themes so far: [agnoster, crcandy, dallas, essembeh, junkfood, nanotech, philips, xiong-chiamiov, ys]
+# Personal favorite themes so far: [3den, agnoster, crcandy, dallas, essembeh, junkfood, nanotech, philips, xiong-chiamiov, ys]
 # Themes to avoid: [jonathan]
 USER root
 RUN apt-get install -y git zsh && \
@@ -202,6 +202,7 @@ RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions && \
         # zsh-syntax-highlighting needs to be the last plugin sourced or things will break, see its readme
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
     sed -i 's/git/git zsh-autosuggestions sudo web-search copybuffer dirhistory zsh_reload history zsh-syntax-highlighting/g' ~/.zshrc
 
 # Some aliases
