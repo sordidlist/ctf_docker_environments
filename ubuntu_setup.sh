@@ -73,9 +73,9 @@ rm bat_0.18.2_amd64.deb
 pip install git+https://github.com/calebstewart/pwncat.git
 
 # Setup CTF aliases
-echo "alias run_ctf_container='sudo docker run --name ctf1 -it -d --cap-add=NET_ADMIN --device /dev/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 ctf_image \"/bin/bash\"'" >> ~/.bashrc
+echo "alias run_ctf_container='sudo docker run --name ctf1 -it -d --cap-add=NET_ADMIN --device /dev/net/tun --sysctl net.ipv6.conf.all.disable_ipv6=0 ctf_image \"/bin/zsh\"'" >> ~/.bashrc
 echo "alias build_ctf_container='cd ~/Tools/ctf_docker_environments/kali_ctf/; sudo docker build . -t ctf_image'" >> ~/.bashrc
-echo "alias enter_ctf_container='sudo docker exec -it ctf1 \"/bin/bash\"'" >> ~/.bashrc
+echo "alias enter_ctf_container='sudo docker exec -it ctf1 \"/bin/zsh\"'" >> ~/.bashrc
 
 # BurpSuite Community Download Link To Current Version
 # https://portswigger.net/burp/communitydownload
