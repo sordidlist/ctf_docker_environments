@@ -155,3 +155,9 @@ cd ~/Tools
 wget git.io/trans
 chmod +x ./trans
 echo "alias trans='~/Tools/trans'" >> ~/.zshrc
+
+# Install OBS
+sudo apt install ffmpeg v4l2loopback-dkms
+sudo add-apt-repository ppa:obsproject/obs-studio
+sudo apt update
+sudo apt install obs-studio
