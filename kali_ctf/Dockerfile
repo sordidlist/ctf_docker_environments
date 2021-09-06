@@ -192,7 +192,7 @@ RUN updatedb
 
 # Oh My Zsh!
 # Personal favorite themes so far: [3den, agnoster, crcandy, dallas, essembeh, junkfood, nanotech, philips, xiong-chiamiov, ys]
-# Themes to avoid: [jonathan]
+# Themes to avoid: [jonathan, strug]
 USER root
 RUN apt-get install -y git zsh && \
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -203,7 +203,8 @@ RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
         # zsh-syntax-highlighting needs to be the last plugin sourced or things will break, see its readme
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
-    sed -i 's/git/git zsh-autosuggestions sudo web-search copybuffer dirhistory zsh_reload history zsh-syntax-highlighting/g' ~/.zshrc
+    sed -i 's/git/git zsh-autosuggestions sudo web-search copybuffer dirhistory zsh_reload history zsh-syntax-highlighting/g' ~/.zshrc && \
+    sed -i 's/# ZSH_THEME_RANDOM_CANDIDATES=( "random" "agnoster" )/ZSH_THEME_RANDOM_CANDIDATES=( "3den" "agnoster" "crcandy" "dallas" "essembeh" "junkfood" "nanotech" "philips" "xiong-chiamiov" "ys" )/g' ~/.zshrc
 
 # Some aliases
 

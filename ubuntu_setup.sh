@@ -112,7 +112,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 mkdir ~/Tools/zenith; cd ~/Tools/zenith;
 wget -q https://github.com/bvaisvil/zenith/releases/download/0.12.0/zenith_0.12.0-1_amd64.deb
 ar -x zenith_0.12.0-1_amd64.deb; xz -d data.tar.xz; tar -xvf data.tar; cp ./usr/bin/zenith .;
-echo "alias zenith=~/Tools/zenith/zenith" >> ~/.bashrc
+echo "alias zenith=~/Tools/zenith/zenith" >> ~/.zshrc
 rm -rf ./usr; rm control.tar.xz data.tar zenith_0.12.0-1_amd64.deb ./debian-binary;
 cd ~/Tools;
 
@@ -139,7 +139,7 @@ cargo install serial-monitor
 
 # fdfind alternative to find
 cargo install fd-find
-echo "alias find='fdfind'" >> ~/.bashrc
+echo "alias find='fdfind'" >> ~/.zshrc
 
 # dtool is a Rust based package for calculating hashes, encrypting files, and other development tasks
 brew install guoxbin/guoxbin/dtool
@@ -149,3 +149,9 @@ sudo apt-get install -y redis-tools
 
 # CLI Torrent manager
 sudo apt install transmission-cli
+
+# Google Translate via CLI
+cd ~/Tools
+wget git.io/trans
+chmod +x ./trans
+echo "alias trans='~/Tools/trans'" >> ~/.zshrc
