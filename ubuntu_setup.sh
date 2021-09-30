@@ -102,7 +102,7 @@ wget https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.21.9547.tar.gz
 
 # Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/frightenedoctopus/.zprofile
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/sordidlist/.zprofile
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # Install Rust
@@ -161,3 +161,5 @@ sudo apt install ffmpeg v4l2loopback-dkms
 sudo add-apt-repository ppa:obsproject/obs-studio
 sudo apt update
 sudo apt install obs-studio
+
+echo "alias getIP='ifconfig | grep tun -C 1 | cut -f 1,10 -d \" \"'" >> ~/.zshrc
