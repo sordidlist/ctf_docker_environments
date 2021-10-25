@@ -223,7 +223,11 @@ RUN echo "alias grep='rg'" >> ~/.bashrc && \
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc && \
     echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.zshrc
 
-RUN echo "alias src="
+RUN echo "alias src='omz reload'" >> ~/.bashrc && \
+    echo "alias src='omz reload'" >> ~/.zshrc
+
+RUN echo "alias what='python3 ~/.local/lib/python3.9/site-packages/pywhat/what.py'" >> ~/.bashrc && \
+    echo "alias what='python3 ~/.local/lib/python3.9/site-packages/pywhat/what.py'" >> ~/.zshrc
 
 # Set timezone
 ENV TZ="America/Denver"
