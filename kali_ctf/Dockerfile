@@ -118,7 +118,8 @@ RUN brew install ripgrep
 # AutoRecon enumeration toolkit
 # Performs a set of port scans, vulnerability scans, and service identifications
 USER root
-RUN python3 -m pip install git+https://github.com/Tib3rius/AutoRecon.git
+RUN git clone --branch beta https://github.com/Tib3rius/AutoRecon && \
+    python3 -m pip install -r /home/AutoRecon/requirements.txt
 
 # Privilege Escalation Awesome Scripts Suite
 # Upload these scripts to exploited hosts and run to discover potential vectors of privesc
@@ -203,17 +204,12 @@ RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc && \
         # zsh-syntax-highlighting needs to be the last plugin sourced or things will break, see its readme
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && \
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && \
-    sed -i 's/git/git zsh-autosuggestions sudo web-search copybuffer dirhistory zsh_reload history zsh-syntax-highlighting/g' ~/.zshrc && \
+    sed -i 's/git/git zsh-autosuggestions sudo web-search copybuffer dirhistory history zsh-syntax-highlighting/g' ~/.zshrc && \
     sed -i 's/# ZSH_THEME_RANDOM_CANDIDATES=( "random" "agnoster" )/ZSH_THEME_RANDOM_CANDIDATES=( "3den" "agnoster" "crcandy" "dallas" "essembeh" "junkfood" "nanotech" "philips" "xiong-chiamiov" "ys" )/g' ~/.zshrc
 
 # Some aliases
 
 RUN sed -i 's/# ENABLE_CORRECTION/ENABLE_CORRECTION/g' ~/.zshrc
-
-# An alias to make using feroxbuster easier
-# Usage: $ ctf_ferox -u http://<TARGET_IP>
-RUN echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.bashrc && \
-    echo "alias ctf_ferox='feroxbuster -x html,css,js,ts,php,py,pdf,txt,rb,asp,aspx -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt'" >> ~/.zshrc
 
 RUN echo "alias ls='lsd -lA'" >> ~/.bashrc && \
     echo "alias ls='lsd -lA'" >> ~/.zshrc
