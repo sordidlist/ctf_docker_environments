@@ -64,6 +64,9 @@ RUN apt-get install -y python3-setuptools && \
 # Install pwntools python3 package for exploit writing
 RUN pip3 install jwt pwntools
 
+# A tool for identifying strange or valuable text strings
+RUN pip3 install pywhat
+
 # Install Metasploit Framework
 RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && \
     chmod 755 msfinstall && \
@@ -219,6 +222,8 @@ RUN echo "alias grep='rg'" >> ~/.bashrc && \
 
 RUN echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.bashrc && \
     echo "alias searchsploit=/opt/exploit-database/searchsploit" >> ~/.zshrc
+
+RUN echo "alias src="
 
 # Set timezone
 ENV TZ="America/Denver"
